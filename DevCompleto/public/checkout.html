@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clube Premier — Checkout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0c0c0e;
+  --surface:   #131317;
+  --border:    #232329;
+  --border-hi: #3a3a45;
+  --accent:    #c9a96e;
+  --accent-dim:#7a6240;
+  --text:      #f0ede8;
+  --muted:     #6b6875;
+  --success:   #3ecf8e;
+  --error:     #f87171;
+  --radius:    12px;
+}
+
+html { height: 100%; }
+
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  line-height: 1.5;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background grain + glow */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,169,110,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 90%, rgba(201,169,110,.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04) inset;
+}
+
+/* LEFT PANEL */
+.left {
+  padding: 52px 48px;
+  background: linear-gradient(160deg, #16151a 0%, #0f0e12 100%);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), #8a6a3a);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.brand-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  letter-spacing: .02em;
+  color: var(--text);
+}
+
+.plan-card {
+  background: rgba(201,169,110,.06);
+  border: 1px solid rgba(201,169,110,.18);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.plan-badge {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.plan-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.plan-price {
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--text);
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 16px 0;
+}
+
+.plan-price sup {
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 10px;
+  color: var(--accent);
+}
+
+.plan-period { font-size: 14px; color: var(--muted); align-self: flex-end; margin-bottom: 8px; }
+
+.features { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+
+.feature {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; color: #b5b2c0;
+}
+
+.feature-dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.guarantee {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: rgba(62,207,142,.06);
+  border: 1px solid rgba(62,207,142,.14);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.guarantee-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+.guarantee-text strong { display: block; font-size: 13px; color: var(--success); margin-bottom: 2px; }
+.guarantee-text span { font-size: 12px; color: var(--muted); }
+
+/* RIGHT PANEL */
+.right {
+  padding: 52px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.form-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.form-header p { font-size: 14px; color: var(--muted); }
+
+/* FORM */
+form { display: flex; flex-direction: column; gap: 20px; }
+
+.field { display: flex; flex-direction: column; gap: 8px; }
+
+.field label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field input {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  outline: none;
+  width: 100%;
+}
+
+.field input::placeholder { color: var(--muted); }
+
+.field input:focus {
+  border-color: var(--accent);
+  background: rgba(201,169,110,.04);
+  box-shadow: 0 0 0 3px rgba(201,169,110,.1);
+}
+
+.field input.valid {
+  border-color: var(--success);
+}
+
+.field input.error {
+  border-color: var(--error);
+}
+
+.field-error {
+  font-size: 12px;
+  color: var(--error);
+  display: none;
+}
+
+.field.has-error .field-error { display: block; }
+.field.has-error input { border-color: var(--error); box-shadow: 0 0 0 3px rgba(248,113,113,.1); }
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Card visual */
+.card-input-wrap {
+  position: relative;
+}
+
+.card-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  pointer-events: none;
+  transition: opacity .2s;
+  opacity: .5;
+}
+
+.card-input-wrap input { padding-right: 44px; }
+
+/* Submit */
+.btn-submit {
+  background: linear-gradient(135deg, var(--accent), #8a6a3a);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  color: #0c0a06;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+  margin-top: 4px;
+  box-shadow: 0 4px 20px rgba(201,169,110,.3);
+}
+
+.btn-submit:hover:not(:disabled) {
+  opacity: .92;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(201,169,110,.4);
+}
+
+.btn-submit:active:not(:disabled) { transform: translateY(0); }
+
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+.btn-submit .btn-text { transition: opacity .2s; }
+.btn-submit .btn-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.btn-submit.loading .btn-text { opacity: 0; }
+.btn-submit.loading .btn-loading { opacity: 1; }
+
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(0,0,0,.2);
+  border-top-color: rgba(0,0,0,.8);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.secure-badge {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* SUCCESS STATE */
+.success-view {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+  flex: 1;
+  padding: 20px 0;
+}
+
+.success-icon {
+  width: 72px; height: 72px;
+  background: rgba(62,207,142,.12);
+  border: 1px solid rgba(62,207,142,.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  animation: pop .5s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes pop {
+  from { transform: scale(.4); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+.success-view h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  color: var(--text);
+}
+
+.success-view p { font-size: 14px; color: var(--muted); max-width: 260px; line-height: 1.7; }
+
+.success-id {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .06em;
+}
+
+/* RESPONSIVE */
+@media (max-width: 720px) {
+  .page { grid-template-columns: 1fr; }
+  .left { padding: 36px 28px; border-right: none; border-bottom: 1px solid var(--border); }
+  .right { padding: 36px 28px; }
+  .plan-price { font-size: 32px; }
+  .row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- LEFT: PLAN INFO -->
+  <div class="left">
+    <div class="brand">
+      <div class="brand-icon">✦</div>
+      <span class="brand-name">Clube Premier</span>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-badge">✦ Plano Selecionado</div>
+      <div class="plan-name">Premier Anual</div>
+      <div class="plan-price">
+        <sup>R$</sup>
+        <span>297</span>
+        <span class="plan-period">/ano</span>
+      </div>
+      <div class="features">
+        <div class="feature"><div class="feature-dot"></div>Acesso completo a todos os benefícios</div>
+        <div class="feature"><div class="feature-dot"></div>Convites exclusivos e eventos privados</div>
+        <div class="feature"><div class="feature-dot"></div>Consultoria personalizada mensal</div>
+        <div class="feature"><div class="feature-dot"></div>Suporte prioritário 24h</div>
+        <div class="feature"><div class="feature-dot"></div>Cancelamento a qualquer momento</div>
+      </div>
+    </div>
+
+    <div class="guarantee">
+      <div class="guarantee-icon">🛡</div>
+      <div class="guarantee-text">
+        <strong>Garantia de 30 dias</strong>
+        <span>Reembolso total sem perguntas caso não fique satisfeito.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: FORM -->
+  <div class="right">
+    <div class="form-header">
+      <h2>Complete seu cadastro</h2>
+      <p>Preencha os dados abaixo para ativar sua assinatura.</p>
+    </div>
+
+    <div id="formView" style="display:flex;flex-direction:column;gap:20px;">
+      <form id="checkoutForm" novalidate>
+
+        <!-- ADICIONE LOGO APÓS <form id="checkoutForm"> -->
+
+<div id="step1">
+  <div class="section-label">Dados pessoais</div>
+
+  <div class="field" id="field-nome">
+    <label>Nome</label>
+  <input type="text" id="nome" placeholder="Nome Completo">
+    <span class="field-error">Nome inválido</span>
+  </div>
+
+    <div class="field" id="field-cpf">
+    <label>CPF</label>
+    <input type="text" id="cpf" placeholder="000.000.000-00" inputmode="numeric">
+    <span class="field-error">CPF inválido</span>
+  </div>
+
+  <div class="field" id="field-email">
+    <label>Email</label>
+    <input type="text" id="email" placeholder="E-mail">
+    <span class="field-error">Email inválido</span>
+  </div>
+
+  <button type="button" onclick="nextStep(2)" class="btn-submit">Continuar</button>
+</div>
+
+<div id="step2" style="display:none;">
+  <div class="section-label">Endereço</div>
+
+  <div class="field" id="field-cep">
+    <label>CEP</label>
+    <input id="cep">
+    <span class="field-error">CEP inválido</span>
+  </div>
+
+  <div class="field" id="field-endereco">
+    <label>Endereço</label>
+    <input id="endereco">
+  </div>
+
+  <div class="row">
+    <input id="numero" placeholder="Número">
+    <input id="cidade" placeholder="Cidade">
+  </div>
+
+  <div class="field">
+    <input id="estado" placeholder="Estado">
+  </div>
+
+  <button type="button" onclick="nextStep(3)" class="btn-submit">Continuar</button>
+</div>
+
+<div id="step3" style="display:none;">
+  <div class="section-label">Pagamento</div>
+
+  <div style="display:flex;gap:10px;margin-bottom:10px;">
+    <button type="button" onclick="selectPayment('card')">Cartão</button>
+    <button type="button" onclick="selectPayment('pix')">PIX</button>
+  </div>
+
+  <!-- CARTÃO -->
+  <div id="cardForm">
+    <input id="cardNum" placeholder="Número">
+    <input id="cardName" placeholder="Nome">
+    <input id ="" placeholder="cpf">
+    <input id="validade" placeholder="MM/AA">
+    <input id="cvv" placeholder="CVV">
+  </div>
+
+  <!-- PIX -->
+  <div id="pixForm" style="display:none;">
+    <p>Após confirmar, o QR Code será gerado.</p>
+  </div>
+
+  <button type="submit" class="btn-submit">Finalizar</button>
+</div>
+
+<!-- ADICIONE ISSO LOGO APÓS "Dados pessoais" -->
+
+<div class="section-label" style="margin-top:12px;">Dados de faturamento</div>
+
+
+<div class="field" id="field-cep">
+  <label for="cep">CEP</label>
+  <input type="text" id="cep" placeholder="00000-000" inputmode="numeric">
+  <span class="field-error">CEP inválido.</span>
+</div>
+
+<div class="field" id="field-endereco">
+  <label for="endereco">Endereço</label>
+  <input type="text" id="endereco" placeholder="Rua, avenida...">
+  <span class="field-error">Endereço obrigatório.</span>
+</div>
+
+<div class="row">
+  <div class="field" id="field-numero">
+    <label for="numero">Número</label>
+    <input type="text" id="numero" placeholder="123">
+    <span class="field-error">Número obrigatório.</span>
+  </div>
+  <div class="field" id="field-cidade">
+    <label for="cidade">Cidade</label>
+    <input type="text" id="cidade" placeholder="Sua cidade">
+    <span class="field-error">Cidade obrigatória.</span>
+  </div>
+</div>
+
+<div class="field" id="field-estado">
+  <label for="estado">Estado</label>
+  <input type="text" id="estado" placeholder="SP">
+  <span class="field-error">Estado obrigatório.</span>
+</div>
+
+        <div class="section-label" style="margin-top:12px;">Dados de pagamento <span style="font-size:10px;opacity:.5;margin-left:8px;">simulado</span></div>
+
+        <div class="field" id="field-cardNum">
+          <label for="cardNum">Número do cartão</label>
+          <div class="card-input-wrap">
+            <input type="text" id="cardNum" placeholder="••••  ••••  ••••  ••••" maxlength="19" autocomplete="cc-number" inputmode="numeric">
+            <span class="card-icon" id="cardIcon">💳</span>
+          </div>
+          <span class="field-error">Número do cartão inválido.</span>
+        </div>
+
+        <div class="field" id="field-cardName">
+          <label for="cardName">Nome no cartão</label>
+          <input type="text" id="cardName" placeholder="Nome igual ao do Cartão" autocomplete="cc-name" style="text-transform:uppercase;">
+          <span class="field-error">Insira o nome como aparece no cartão.</span>
+        </div>
+
+        <div class="row">
+          <div class="field" id="field-validade">
+            <label for="validade">Validade</label>
+            <input type="text" id="validade" placeholder="MM/AA" maxlength="5" inputmode="numeric">
+            <span class="field-error">Validade inválida.</span>
+          </div>
+          <div class="field" id="field-cvv">
+            <label for="cvv">CVV</label>
+            <input type="text" id="cvv" placeholder="•••" maxlength="4" inputmode="numeric">
+            <span class="field-error">CVV inválido.</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">Ativar assinatura — R$ 297</span>
+          <span class="btn-loading">
+            <span class="spinner"></span>
+            Processando...
+          </span>
+        </button>
+
+        <div class="secure-badge">🔒 Ambiente simulado · Nenhum dado real é processado</div>
+
+      </form>
+    </div>
+
+    <div class="success-view" id="successView">
+      <div class="success-icon">✓</div>
+      <div>
+        <h3>Bem-vindo ao clube!</h3>
+      </div>
+      <p>Seu cadastro foi realizado com sucesso. Você receberá um e-mail de confirmação em breve.</p>
+      <div class="success-id" id="successId">ID: —</div>
+      <button onclick="location.reload()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 24px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">
+        Novo cadastro
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = window.location.origin;
+
+// ─── MASKS ────────────────────────────────────────────────────────
+const cardNum   = document.getElementById('cardNum');
+const validade  = document.getElementById('validade');
+const cvv       = document.getElementById('cvv');
+const cardName  = document.getElementById('cardName');
+const cardIcon  = document.getElementById('cardIcon');
+
+// 🔥 NOVOS CAMPOS
+const cpf = document.getElementById('cpf');
+const cep = document.getElementById('cep');
+
+// ─── MASK CPF ─────────────────────────────────────────────────────
+cpf.addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  e.target.value = v;
+});
+
+// ─── MASK CEP ─────────────────────────────────────────────────────
+cep.addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+  v = v.replace(/(\d{5})(\d)/, '$1-$2');
+  e.target.value = v;
+});
+
+cardNum.addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 16);
+  e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+
+  const brand = detectBrand(v);
+  cardIcon.textContent = brand === 'visa' ? '💳' : brand === 'mastercard' ? '🟠' : brand === 'amex' ? '🔵' : '💳';
+});
+
+validade.addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 4);
+  if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2);
+  e.target.value = v;
+});
+
+cvv.addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+});
+
+cardName.addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+});
+
+function detectBrand(n) {
+  if (/^4/.test(n)) return 'visa';
+  if (/^5[1-5]/.test(n)) return 'mastercard';
+  if (/^3[47]/.test(n)) return 'amex';
+  return 'unknown';
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────
+function setError(fieldId, hasError) {
+  const el = document.getElementById('field-' + fieldId);
+  if (!el) return;
+  el.classList.toggle('has-error', hasError);
+}
+
+function validateAll() {
+const cpfVal = cpf.value.replace(/\D/g, '');
+const cpfOk = cpfVal.length === 11;
+setError('cpf', !cpfOk);
+if (!cpfOk) ok = false;
+
+const cepVal = cep.value.replace(/\D/g, '');
+const cepOk = cepVal.length === 8;
+setError('cep', !cepOk);
+if (!cepOk) ok = false;
+
+const enderecoOk = document.getElementById('endereco').value.trim().length > 3;
+setError('endereco', !enderecoOk);
+if (!enderecoOk) ok = false;
+
+const numeroOk = document.getElementById('numero').value.trim().length > 0;
+setError('numero', !numeroOk);
+if (!numeroOk) ok = false;
+
+const cidadeOk = document.getElementById('cidade').value.trim().length > 2;
+setError('cidade', !cidadeOk);
+if (!cidadeOk) ok = false;
+
+const estadoOk = document.getElementById('estado').value.trim().length >= 2;
+setError('estado', !estadoOk);
+if (!estadoOk) ok = false;
+
+  let ok = true;
+
+  const nome = document.getElementById('nome').value.trim();
+  const nomeOk = nome.length >= 2;
+  setError('nome', !nomeOk);
+  if (!nomeOk) ok = false;
+
+  const email = document.getElementById('email').value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  setError('email', !emailOk);
+  if (!emailOk) ok = false;
+
+  const telefone = document.getElementById('telefone').value.replace(/\D/g, '');
+  const telOk = telefone.length >= 10;
+  setError('telefone', !telOk);
+  if (!telOk) ok = false;
+
+  const num = cardNum.value.replace(/\D/g, '');
+  const numOk = num.length >= 13;
+  setError('cardNum', !numOk);
+  if (!numOk) ok = false;
+
+  const cnOk = cardName.value.trim().length >= 2;
+  setError('cardName', !cnOk);
+  if (!cnOk) ok = false;
+
+  const val = validade.value;
+  const valOk = /^\d{2}\/\d{2}$/.test(val);
+  setError('validade', !valOk);
+  if (!valOk) ok = false;
+
+  const cvvVal = cvv.value.replace(/\D/g, '');
+  const cvvOk = cvvVal.length >= 3;
+  setError('cvv', !cvvOk);
+  if (!cvvOk) ok = false;
+
+  return ok;
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────
+document.getElementById('checkoutForm').addEventListener('submit', async e => { 
+  e.preventDefault();
+  if (!validateAll()) return;
+
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+const payload = {
+  nome: document.getElementById('nome').value.trim(),
+  email: document.getElementById('email').value.trim(),
+  telefone: document.getElementById('telefone').value.trim(),
+  plano: 'premier-anual',
+
+  documento: {
+    cpf: cpf.value.replace(/\D/g, '')
+  },
+
+  endereco: {
+    cep: cep.value.replace(/\D/g, ''),
+    rua: document.getElementById('endereco').value.trim(),
+    numero: document.getElementById('numero').value.trim(),
+    cidade: document.getElementById('cidade').value.trim(),
+    estado: document.getElementById('estado').value.trim()
+  },
+
+  cartao: {
+    numero: cardNum.value.replace(/\D/g, ''),
+    nome: cardName.value.trim(),
+    validade: validade.value,
+    cvv: cvv.value
+  }
+};
+
+    const res = await fetch(API + '/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.ok) {
+      document.getElementById('formView').style.display = 'none';
+      const sv = document.getElementById('successView');
+      sv.style.display = 'flex';
+      document.getElementById('successId').textContent = 'ID: ' + data.id;
+    } else {
+      alert(data.erro || 'Erro ao processar. Tente novamente.');
+    }
+  } catch (err) {
+    alert('Erro de conexão. Verifique o servidor.');
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+});
+
+// Real-time blur validation
+['nome','email','telefone','cardNum','cardName','validade','cvv'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('blur', () => validateAll());
+  }
+});
+</script>
+
+</body>
+</html>
